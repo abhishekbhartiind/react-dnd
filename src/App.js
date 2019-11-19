@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
+import initialState from './initialState';
+import TaskList from './Components/TaskList'
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = initialState
+
+  //Move task when dropped
+  onDrop = (item, targetId) => {
+    this.setState(state => {
+      return {
+        tasks: [
+          ...state.tasks.filter(task => task.id !== item.id),
+          {
+            ...item, listId: targetId
+          }
+        ]
+      }
+    })
+  }
+
+  //render each list
+  renderList = () => {
+    const {lists, tasks} = this.state
+    return lists.map(list => (
+      <TaskList
+        key={list}
+        id={list}
+        tasks={tasks.filter(t => t.listId === list)}
+        onDrop={this.onDrop}
+      />
+    ))
+  }
+
+  render(){
+    return (
+      <div style={{display: "flex", minHeight: "200px"}}>
+        {this.renderList()}
+      </div>
+    );
+  }
 }
 
 export default App;
